@@ -198,7 +198,7 @@ def get_stats() -> Dict:
     }
 
 # Settings functions
-def save_smtp_settings(email: str, password: str, receiver: str):
+def save_smtp_settings(email: str, password: str, receiver: str, **kwargs):
     """Save SMTP settings to the database"""
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -206,7 +206,8 @@ def save_smtp_settings(email: str, password: str, receiver: str):
     settings = [
         ('smtp_email', email),
         ('smtp_password', password),
-        ('receiver_email', receiver)
+        ('receiver_email', receiver),
+        ('resend_api_key', kwargs.get('resend_api_key', ''))
     ]
     
     for key, value in settings:
@@ -232,5 +233,6 @@ def get_smtp_settings() -> Dict:
     return {
         "smtp_email": settings.get('smtp_email', ''),
         "smtp_password": settings.get('smtp_password', ''),
-        "receiver_email": settings.get('receiver_email', '')
+        "receiver_email": settings.get('receiver_email', ''),
+        "resend_api_key": settings.get('resend_api_key', '')
     }

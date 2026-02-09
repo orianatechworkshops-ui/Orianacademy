@@ -577,7 +577,14 @@
                     </div>
                     <div class="form-group">
                         <label>Receiver Email ID</label>
-                        <input type="email" id="receiver_email" placeholder="Where should notifications go?" required>
+                        <input type="email" id="receiver_email" placeholder="notifications@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Resend API Key (for Railway/Cloud)</label>
+                        <input type="text" id="resend_api_key" placeholder="re_...">
+                        <small style="color: #64748b; font-size: 0.8rem;">Use <a href="https://resend.com"
+                                target="_blank" style="color: #6366f1;">Resend</a> to bypass Railway SMTP
+                            blocks.</small>
                     </div>
                     <button type="submit" class="export-btn" style="width: 100%; margin-top: 1rem;">Save
                         Settings</button>
@@ -866,6 +873,7 @@
                 document.getElementById('smtp_email').value = settings.smtp_email || '';
                 document.getElementById('smtp_password').value = settings.smtp_password || '';
                 document.getElementById('receiver_email').value = settings.receiver_email || '';
+                document.getElementById('resend_api_key').value = settings.resend_api_key || '';
             } catch (error) {
                 console.error('Error loading settings:', error);
             }
@@ -880,17 +888,16 @@
             submitBtn.textContent = 'Saving...';
             submitBtn.disabled = true;
 
-            const settings = {
-                smtp_email: document.getElementById('smtp_email').value,
-                smtp_password: document.getElementById('smtp_password').value,
-                receiver_email: document.getElementById('receiver_email').value
-            };
+            const smtp_email = document.getElementById('smtp_email').value;
+            const smtp_password = document.getElementById('smtp_password').value;
+            const receiver_email = document.getElementById('receiver_email').value;
+            const resend_api_key = document.getElementById('resend_api_key').value;
 
             try {
                 const res = await fetch('/api/admin/settings', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(settings)
+                    body: JSON.stringify({ smtp_email, smtp_password, receiver_email, resend_api_key })
                 });
 
                 if (res.ok) {

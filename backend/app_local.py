@@ -251,6 +251,7 @@ class SMTPSettings(BaseModel):
     smtp_email: str
     smtp_password: str
     receiver_email: str
+    resend_api_key: str = ""
 
 @app.get("/api/admin/settings")
 async def get_admin_settings_endpoint():
@@ -266,7 +267,8 @@ async def update_admin_settings_endpoint(settings: SMTPSettings):
         save_smtp_settings(
             settings.smtp_email, 
             settings.smtp_password, 
-            settings.receiver_email
+            settings.receiver_email,
+            resend_api_key=settings.resend_api_key
         )
         return {"message": "Settings updated successfully"}
     except Exception as e:

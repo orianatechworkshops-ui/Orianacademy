@@ -11,6 +11,8 @@ import google.generativeai as genai
 import os
 import numpy as np
 from dotenv import load_dotenv
+import mimetypes
+mimetypes.add_type('image/webp', '.webp')
 
 # NumPy 2.0 Compatibility Patch
 if not hasattr(np, "float_"):
@@ -32,9 +34,11 @@ from email_utils import send_notification_email
 load_dotenv()
 
 # Initialize FastAPI app
+from fastapi.middleware.gzip import GZipMiddleware
 app = FastAPI(title="Oriana Academy RAG API (Local Embeddings)", version="1.0.0")
 
 # CORS middleware
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -482,3 +486,13 @@ if __name__ == "__main__":
     print(f"🤖 Embedding: all-MiniLM-L6-v2 (lazy loaded)")
     print(f"{'='*60}\n")
     uvicorn.run(app, host="0.0.0.0", port=port)
+
+@app.get('/api/debug/assets')
+async def debug_assets():
+    assets_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'assets', 'images')
+    files = []
+    if os.path.exists(assets_dir):
+        for root, dirs, filenames in os.walk(assets_dir):
+            for f in filenames:
+                files.append(os.path.relpath(os.path.join(root, f), assets_dir))
+    return {'assets_found': len(files), 'sample_files': files[:20]}
